@@ -84,7 +84,13 @@ def get_df(data, start_ind):
 
     return df
 
-def make_cmap(df, chartname):
+def make_cmap(df, chartname, normalisation_F):
+    
+    #make all values float
+    df[list(df.columns.values)] = df[list(df.columns.values)].astype(float)
+    
+    # multiply by normalisation factor
+    df = df.multiply(normalisation_F)
     
     X=df.columns.values
     Y=df.index.values
@@ -93,10 +99,10 @@ def make_cmap(df, chartname):
     # log cmap
     pic = plt.contourf(x, y, Z,cmp='hot', norm = LogNorm())
     # add axis labels
-    pic.ax.set_xlabel('Dimensions [cm]')
-    pic.ax.set_ylabel('Dimensions [cm]')
+    pic.ax.set_xlabel('Dimensions [cm]', fontsize = 18, fontname="Arial")
+    pic.ax.set_ylabel('Dimensions [cm]', fontsize = 18, fontname="Arial")
     clb = plt.colorbar()
-    clb.ax.set_title('µSv/h')
+    clb.ax.set_title('µSv/h', fontsize = 12, fontname="Arial")
     
     # Reduces white spaces around cbar.
     plt.savefig(chartname, bbox_inches='tight')
@@ -147,8 +153,13 @@ if __name__ == "__main__":
     
     #get list of files
     filelist = get_files('.msht')
-       
+          
     for files in filelist:
+        
+        #N_factor
+        N_factor = float(input("Enter normalisation factor for {0}: ".format(files) ))
+        print("Thanks")
+        
         data = get_array(files)
         Ntal, tally_num, tall_ind, tally_cord = count_Ntally(data)
         
@@ -165,7 +176,7 @@ if __name__ == "__main__":
                 
                 o_name = files.split('.')[0] + '-T' + tally_num[i] + '-' + tally_cord[i] + '.png'
                                
-                make_cmap(df, o_name)
+                make_cmap(df, o_name, N_factor)
                 
 
        
